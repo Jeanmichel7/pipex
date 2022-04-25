@@ -6,7 +6,7 @@
 /*   By: jrasser <jrasser@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/08 20:09:07 by jrasser           #+#    #+#             */
-/*   Updated: 2022/04/25 17:59:28 by jrasser          ###   ########.fr       */
+/*   Updated: 2022/04/25 18:22:52 by jrasser          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,11 +37,11 @@ void	run_pipe()
 {
 
 	char	*execve_arg1;
-	char	*execve_cmd_args[3];
+	char	*execve_cmd_args[4];
 	char	**execve_cmd_args_extend;
 	int		tube[2];
 	pid_t	child2;
-	char	*execve_cmd2_args[3];
+	char	*execve_cmd2_args[4];
 
 	
 	printf("jusque la ca marche\n");
@@ -49,22 +49,27 @@ void	run_pipe()
 
 	execve_cmd_args[0] = "/bin/grep";
 	execve_cmd_args[1] = "key";
-	execve_cmd_args[2] = NULL;
+	execve_cmd_args[2] = "fichier1.txt";
+	execve_cmd_args[3] = NULL;
 	printf("jusque la ca marche\n");
 
 	execve_cmd2_args[0] = "/bin/cat";
 	execve_cmd2_args[1] = "-e";
-	execve_cmd2_args[2] = NULL;
+	execve_cmd2_args[2] = "fichier2.txt";
+	execve_cmd2_args[3] = NULL;
 /*
 	execve_cmd_args = ft_split(argv[2], ' ');
 	execve_cmd_args_extend = ft_add_file(execve_cmd_args, argv[1]);
 	execve_arg1 = ft_strjoin("/bin/", execve_cmd_args_extend[0]);
 */
+	pipe(tube);
+	tube[0] = open("fichier1.txt", O_WRONLY | O_APPEND);
+	tube[1] = open("fichier2.txt", O_WRONLY | O_APPEND);
+
 
 	child2 = fork();
 	printf("fork 2: %d, PID : %i\n", child2, getpid());
 
-	pipe(tube);
 	
 	if (child2 == -1)
 	{
@@ -76,12 +81,12 @@ void	run_pipe()
 	{
 		dup2(tube[1], STDOUT_FILENO);
 		close(tube[0]);
-		printf("dans le processus fils : fork : %d, PID : %i\n", child2, getpid());
+		printf("dans le processus fils pipe: fork : %d, PID : %i\n", child2, getpid());
 		execve("/bin/grep", execve_cmd_args, NULL);
 		perror("Error 2");
 	}
 	
-	printf("dans le processus pere : fork : %d, PID : %i\n", child2, getpid());
+	printf("dans le processus pere pipe: fork : %d, PID : %i\n", child2, getpid());
 	dup2(tube[0], STDIN_FILENO);
 	close(tube[1]);
 	printf("debut du process fils pipe\n");
