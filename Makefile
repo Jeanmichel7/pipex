@@ -6,11 +6,11 @@
 #    By: jrasser <jrasser@student.42.fr>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/04/08 20:19:03 by jrasser           #+#    #+#              #
-#    Updated: 2022/04/08 20:26:19 by jrasser          ###   ########.fr        #
+#    Updated: 2022/04/25 13:30:03 by jrasser          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
-SRCS			= srcs/ft_check_arg.c
+SRCS			= srcs/ft_check_arg.c srcs/ft_split.c srcs/ft_strlen.c srcs/ft_strjoin.c
 				
 OBJS			= ${SRCS:.c=.o}
 NAME			= pipex

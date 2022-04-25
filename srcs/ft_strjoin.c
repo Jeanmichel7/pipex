@@ -1,27 +1,36 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_check_arg.c                                     :+:      :+:    :+:   */
+/*   ft_strjoin.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: jrasser <jrasser@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/03/28 17:56:23 by jeulliot          #+#    #+#             */
-/*   Updated: 2022/04/25 13:04:26 by jrasser          ###   ########.fr       */
+/*   Created: 2022/04/25 13:26:09 by jrasser           #+#    #+#             */
+/*   Updated: 2022/04/25 13:38:51 by jrasser          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/pipex.h"
 
-void	ft_check_arg_error(int argc, char **argv)
+char	*ft_strjoin(char *line, char *buffer)
 {
-	(void)argv;
-	(void)argc;
+	size_t	i;
+	size_t	j;
+	char	*new_str;
 
-	/*
-	if (argc != 5)
+	new_str = malloc(sizeof(char) * (ft_strlen(line) + ft_strlen(buffer)) + 1);
+	if (new_str == NULL)
+		return (NULL);
+	i = 0;
+	while (line && line[i])
 	{
-		write (2, "Error\n", 6);
-		exit (1);
+		new_str[i] = line[i];
+		i++;
 	}
-	*/
+	j = 0;
+	while (buffer && buffer[j])
+		new_str[i++] = buffer[j++];
+
+	new_str[i] = '\0';
+	return (new_str);
 }

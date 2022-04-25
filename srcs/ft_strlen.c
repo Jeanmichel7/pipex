@@ -1,27 +1,25 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_check_arg.c                                     :+:      :+:    :+:   */
+/*   ft_strlen.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: jrasser <jrasser@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/03/28 17:56:23 by jeulliot          #+#    #+#             */
-/*   Updated: 2022/04/25 13:04:26 by jrasser          ###   ########.fr       */
+/*   Created: 2022/04/25 13:27:14 by jrasser           #+#    #+#             */
+/*   Updated: 2022/04/25 13:27:23 by jrasser          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/pipex.h"
 
-void	ft_check_arg_error(int argc, char **argv)
+size_t	ft_strlen(const char *str)
 {
-	(void)argv;
-	(void)argc;
+	size_t	i;
 
-	/*
-	if (argc != 5)
-	{
-		write (2, "Error\n", 6);
-		exit (1);
-	}
-	*/
+	if (!str)
+		return (0);
+	i = 0;
+	while (str[i])
+		i++;
+	return (i);
 }
