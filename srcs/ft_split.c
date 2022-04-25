@@ -6,7 +6,7 @@
 /*   By: jrasser <jrasser@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/25 21:00:34 by jrasser           #+#    #+#             */
-/*   Updated: 2022/04/25 13:26:19 by jrasser          ###   ########.fr       */
+/*   Updated: 2022/04/25 15:59:45 by jrasser          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,7 +66,8 @@ char	**ft_split(char const *s, char c)
 	j = 0;
 	while (i < ft_count(s, c))
 	{
-		tab[i++] = ft_sub_split(s, c, &j);
+		tab[i] = ft_sub_split(s, c, &j);
+		i++;
 	}	
 	tab[i] = NULL;
 	return (tab);

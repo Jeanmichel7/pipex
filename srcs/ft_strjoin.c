@@ -6,7 +6,7 @@
 /*   By: jrasser <jrasser@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/25 13:26:09 by jrasser           #+#    #+#             */
-/*   Updated: 2022/04/25 13:38:51 by jrasser          ###   ########.fr       */
+/*   Updated: 2022/04/25 15:29:40 by jrasser          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,10 @@ char	*ft_strjoin(char *line, char *buffer)
 	j = 0;
 	while (buffer && buffer[j])
 		new_str[i++] = buffer[j++];
-
 	new_str[i] = '\0';
 	return (new_str);
 }
+
+/*
+execve_arg1 = ft_strjoin("/bin/", execve_cmd_args[0]);
+*/
