@@ -6,7 +6,7 @@
 /*   By: jrasser <jrasser@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/08 20:09:07 by jrasser           #+#    #+#             */
-/*   Updated: 2022/04/25 13:49:54 by jrasser          ###   ########.fr       */
+/*   Updated: 2022/04/25 15:25:35 by jrasser          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,20 +36,34 @@ int	main(int argc, char **argv)
 {
 	char	*execve_arg1;
 	char	**execve_cmd_args;
+	pid_t	father;
 
 	execve_cmd_args = ft_split(argv[2], ' ');
 	execve_cmd_args = ft_add_file(execve_cmd_args, argv[1]);
-
 	execve_arg1 = ft_strjoin("/bin/", execve_cmd_args[0]);
-
-
 	
+	father = fork();
+	printf("fork : %d, PID : %i\n", father, getpid());
+	
+	if (father > 0)
+	{
+		//execve(execve_arg1, execve_cmd_args, NULL);
+		printf("dans le process pere : fork : %d, PID : %i\n", father, getpid());
+		
+		printf("debut du process fils\n");
+		wait(NULL);
+		printf("fin du process fils \n");
+	}
+	if (father == 0)
+	{
+		printf("dans le processus fils : fork : %d, PID : %i\n", father, getpid());
+		execve(execve_arg1, execve_cmd_args, NULL);
+	}
 
-	//printf("arg1 : '%s'\n", execve_arg1);
-	//printf("cmd_args : '%s'\n", execve_cmd_args[0]);
+	printf("arg1 : '%s'\n", execve_arg1);
+	printf("cmd_args : '%s'\n", execve_cmd_args[0]);
 
 	//ft_check_arg_error(argc, argv);
-	execve(execve_arg1, execve_cmd_args, NULL);
 
 	return (0);
 }
