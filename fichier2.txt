@@ -26,3 +26,18 @@ dans le processus fils pipe: fork : 0, PID : 19727
     key1 : "un message",
     key2 : "un autre message",
     key3 : "une ville"
+    key1 : "un message",
+    key2 : "un autre message",
+    key3 : "une ville"
+    key1 : "un message",
+    key2 : "un autre message",
+    key3 : "une ville"
+    key1 : "un message",
+    key2 : "un autre message",
+    key3 : "une ville"
+    key1 : "un message",
+    key2 : "un autre message",
+    key3 : "une ville"
+    key1 : "un message",
+    key2 : "un autre message",
+    key3 : "une ville"
