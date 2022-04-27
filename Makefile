@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: jrasser <jrasser@student.42.fr>            +#+  +:+       +#+         #
+#    By: jrasser <jrasser@42.fr>                    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/04/08 20:19:03 by jrasser           #+#    #+#              #
-#    Updated: 2022/04/25 13:30:03 by jrasser          ###   ########.fr        #
+#    Updated: 2022/04/27 15:55:08 by jrasser          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -16,7 +16,7 @@ OBJS			= ${SRCS:.c=.o}
 NAME			= pipex
 CC				= gcc
 RM				= rm -f
-CFLAGS			= -Wall -Wextra -Werror
+CFLAGS			= -Wall -Wextra
 CPPFLAGS		= -I./includes/
 
 ${NAME}:		${OBJS}
