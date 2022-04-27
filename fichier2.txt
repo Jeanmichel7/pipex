@@ -1,7 +1,1 @@
-premiere phrase$
-object : {$
-    key1 : "un message",$
-    key2 : "un autre message",$
-    key3 : "une ville"$
-}$
-FIN.
+       6$

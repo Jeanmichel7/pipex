@@ -6,7 +6,7 @@
 /*   By: jrasser <jrasser@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/08 20:09:07 by jrasser           #+#    #+#             */
-/*   Updated: 2022/04/27 17:23:03 by jrasser          ###   ########.fr       */
+/*   Updated: 2022/04/27 19:52:09 by jrasser          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,36 +33,28 @@ char	**ft_add_file(char **tab, char *file)
 	return (new_tab);
 }
 
-/*
-void	run_pipe(char *arg1, char **cmd_args1, char *cmd2_arg1, char **cmd2_args)
-{
-	child2 = fork();
-	printf("fork 2: %d, PID : %i\n", child2, getpid());
+char	*ft_checkacces (char **env, char *cmd) {
+	int 	i = -1;
+	int		state = 1;
+	char	*path_cmd_test;
+	char	*paths;
+	char	**path_tab;
 
-	if (child2 == -1)
+	while (env[++i])
+		if (strncmp(env[i], "PATH", 4) == 0)
+			paths = env[i];
+	paths = paths + 5;
+	path_tab = ft_split(paths, ':');
+	i = 0;
+	while (path_tab[i] && state)
 	{
-		close(tube[0]);
-		close(tube[1]);
-		perror("Error");
+		path_cmd_test = ft_strjoin(ft_strjoin(path_tab[i], "/"), cmd);
+		if (access(path_cmd_test, F_OK | X_OK) == 0)
+			return (path_cmd_test);
+		i++;
 	}
-	if (child2 == 0)
-	{
-		//dup2(tube[1], STDOUT_FILENO);
-		//close(tube[0]);
-		execve(arg1, cmd_args1, NULL);
-		perror("Error 2");
-	}
-	
-	printf("dans le processus pere pipe: fork : %d, PID : %i\n", child2, getpid());
-	//dup2(tube[0], STDIN_FILENO);
-	//close(tube[1]);
-	printf("debut du process fils pipe\n");
-	wait(NULL);
-	printf("fin du process fils pipe\n");
-	execve(cmd2_arg1, cmd2_args, NULL);
-	return;
+	return (NULL);
 }
-*/
 
 int	main(int argc, char **argv, char **env)
 {
@@ -74,14 +66,31 @@ int	main(int argc, char **argv, char **env)
 	char	**cmd1_args;
 	char	*cmd2_fct;
 	char	**cmd2_args;
+	int		ret;
+
+
+	char	*cmd1_path;
+	char	*cmd2_path;
+
+	cmd1_args = ft_split(argv[2], ' ');
+	cmd1_path = ft_checkacces(env, cmd1_args[0]);
+	cmd1_fct = cmd1_path;
+	printf("cmd 1 : %s\n", cmd1_fct);
+
+	cmd2_args = ft_split(argv[3], ' ');
+	cmd2_path = ft_checkacces(env, cmd2_args[0]);
+	cmd2_fct = cmd2_path;
+	printf("cmd 2 : %s\n", cmd2_fct);
+
+
 
 	fd1 = open(argv[1], O_RDONLY);
-	fd2 = open(argv[4], O_WRONLY | O_CREAT | O_TRUNC, 0777);	
-	cmd1_args = ft_split(argv[2], ' ');
-	cmd1_fct = ft_strjoin("/bin/", cmd1_args[0]);
-	cmd2_args = ft_split(argv[3], ' ');
-	cmd2_fct = ft_strjoin("/bin/", cmd2_args[0]);
+	fd2 = open(argv[4], O_WRONLY | O_CREAT | O_TRUNC, S_IRWXU);
+
+
 	pipe(tube);
+	//tube[0] = STDIN_FILENO;
+	//tube[1] = STDOUT_FILENO;
 	child = fork();
 	if (child == -1)
 	{
@@ -92,7 +101,9 @@ int	main(int argc, char **argv, char **env)
 		dup2(fd1, STDIN_FILENO);
 		dup2(tube[1], STDOUT_FILENO);
 		close(tube[0]);
-		execve(cmd1_fct, cmd1_args, env);
+		ret = execve(cmd1_fct, cmd1_args, env);
+		if (ret == -1)
+			perror("Error cmd 1");
 		close(fd1);
 	}
 
@@ -100,7 +111,9 @@ int	main(int argc, char **argv, char **env)
 	dup2(tube[0], STDIN_FILENO);
 	close(tube[1]);
 	dup2(fd2, STDOUT_FILENO);
-	execve(cmd2_fct, cmd2_args, env);
+	ret = execve(cmd2_fct, cmd2_args, env);
+	if (ret == -1)
+		perror("Error cmd 2");
 	close(fd2);
 
 	return (0);
