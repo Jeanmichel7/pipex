@@ -6,34 +6,21 @@
 /*   By: jrasser <jrasser@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/08 20:09:07 by jrasser           #+#    #+#             */
-/*   Updated: 2022/04/27 19:52:09 by jrasser          ###   ########.fr       */
+/*   Updated: 2022/04/28 14:05:51 by jrasser          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "includes/pipex.h"
 
-char	**ft_add_file(char **tab, char *file)
+void	ft_errputstr(char *str)
 {
-	char	**new_tab;
-
-	int i = 0;
-	while (tab[i])
-		i++;
-	new_tab = malloc(sizeof(char *) * (i + 2));
-	i = 0;
-	while (tab[i])
+	if (str)
 	{
-		new_tab[i] = tab[i];
-		i++;
+		write(2, str, ft_strlen(str));
 	}
-	new_tab[i] = file;
-	i++;
-	new_tab[i] = NULL;
-	free(tab);
-	return (new_tab);
 }
 
-char	*ft_checkacces (char **env, char *cmd) {
+char	*ft_checkacces(char **env, char *cmd) {
 	int 	i = -1;
 	int		state = 1;
 	char	*path_cmd_test;
@@ -68,33 +55,45 @@ int	main(int argc, char **argv, char **env)
 	char	**cmd2_args;
 	int		ret;
 
-
-	char	*cmd1_path;
-	char	*cmd2_path;
-
+	ft_check_arg_error(argc, argv);
 	cmd1_args = ft_split(argv[2], ' ');
-	cmd1_path = ft_checkacces(env, cmd1_args[0]);
-	cmd1_fct = cmd1_path;
-	printf("cmd 1 : %s\n", cmd1_fct);
-
+	cmd1_fct = ft_checkacces(env, cmd1_args[0]);
 	cmd2_args = ft_split(argv[3], ' ');
-	cmd2_path = ft_checkacces(env, cmd2_args[0]);
-	cmd2_fct = cmd2_path;
-	printf("cmd 2 : %s\n", cmd2_fct);
-
-
-
+	cmd2_fct = ft_checkacces(env, cmd2_args[0]);
 	fd1 = open(argv[1], O_RDONLY);
 	fd2 = open(argv[4], O_WRONLY | O_CREAT | O_TRUNC, S_IRWXU);
-
-
+	if (cmd1_fct == NULL)
+	{
+		ft_errputstr("zsh: command not found: ");
+		ft_errputstr(cmd1_args[0]);
+		ft_errputstr("\n");
+	}
+	if (cmd2_fct == NULL)
+	{
+		ft_errputstr("zsh: command not found: ");
+		ft_errputstr(cmd2_args[0]);
+		ft_errputstr("\n");
+		return (0);
+	}
+	if (fd1 == - 1)
+	{
+		ft_errputstr("zsh: no such file or directory: ");
+		ft_errputstr(argv[1]);
+		ft_errputstr("\n");
+		return (0);
+	}
+	if (fd2 == - 1)
+	{
+		perror("opening or creation impossible\n");
+		ft_errputstr(strerror(errno));
+		return (0);
+	}
 	pipe(tube);
-	//tube[0] = STDIN_FILENO;
-	//tube[1] = STDOUT_FILENO;
 	child = fork();
 	if (child == -1)
 	{
 		perror("Error");
+		return (1);
 	}
 	if (child == 0)
 	{
@@ -102,10 +101,15 @@ int	main(int argc, char **argv, char **env)
 		dup2(tube[1], STDOUT_FILENO);
 		close(tube[0]);
 		ret = execve(cmd1_fct, cmd1_args, env);
-		if (ret == -1)
-			perror("Error cmd 1");
+		if (ret == -1 )
+		{
+			if (cmd1_fct != NULL)
+				ft_errputstr(strerror(errno));
+			return (1);
+		}
 		close(fd1);
 	}
+	else{
 
 	waitpid(child, NULL, WNOHANG);
 	dup2(tube[0], STDIN_FILENO);
@@ -113,8 +117,19 @@ int	main(int argc, char **argv, char **env)
 	dup2(fd2, STDOUT_FILENO);
 	ret = execve(cmd2_fct, cmd2_args, env);
 	if (ret == -1)
-		perror("Error cmd 2");
+	{
+		//perror("Error cmd2\n");
+		//printf("error : %s\n", strerror(errno));
+		ft_errputstr(strerror(errno));
+		return (1);
+	}
 	close(fd2);
+	}
+
+	free(cmd1_fct);
+	free(cmd1_args);
+	free(cmd2_fct);
+	free(cmd1_args);
 
 	return (0);
 }
