@@ -6,7 +6,7 @@
 /*   By: jrasser <jrasser@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/08 20:09:07 by jrasser           #+#    #+#             */
-/*   Updated: 2022/04/28 14:05:51 by jrasser          ###   ########.fr       */
+/*   Updated: 2022/04/28 14:17:28 by jrasser          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,13 +20,16 @@ void	ft_errputstr(char *str)
 	}
 }
 
-char	*ft_checkacces(char **env, char *cmd) {
-	int 	i = -1;
-	int		state = 1;
+char	*ft_checkacces(char **env, char *cmd)
+{
+	int		i;
+	int		state;
 	char	*path_cmd_test;
 	char	*paths;
 	char	**path_tab;
 
+	i = -1;
+	state = 1;
 	while (env[++i])
 		if (strncmp(env[i], "PATH", 4) == 0)
 			paths = env[i];
@@ -47,13 +50,12 @@ int	main(int argc, char **argv, char **env)
 {
 	pid_t	child;
 	int		tube[2];
-	int 	fd1;
+	int		fd1;
 	int		fd2;
 	char	*cmd1_fct;
 	char	**cmd1_args;
 	char	*cmd2_fct;
 	char	**cmd2_args;
-	int		ret;
 
 	ft_check_arg_error(argc, argv);
 	cmd1_args = ft_split(argv[2], ' ');
@@ -100,8 +102,7 @@ int	main(int argc, char **argv, char **env)
 		dup2(fd1, STDIN_FILENO);
 		dup2(tube[1], STDOUT_FILENO);
 		close(tube[0]);
-		ret = execve(cmd1_fct, cmd1_args, env);
-		if (ret == -1 )
+		if (execve(cmd1_fct, cmd1_args, env) == -1 )
 		{
 			if (cmd1_fct != NULL)
 				ft_errputstr(strerror(errno));
@@ -109,23 +110,19 @@ int	main(int argc, char **argv, char **env)
 		}
 		close(fd1);
 	}
-	else{
-
-	waitpid(child, NULL, WNOHANG);
-	dup2(tube[0], STDIN_FILENO);
-	close(tube[1]);
-	dup2(fd2, STDOUT_FILENO);
-	ret = execve(cmd2_fct, cmd2_args, env);
-	if (ret == -1)
+	else
 	{
-		//perror("Error cmd2\n");
-		//printf("error : %s\n", strerror(errno));
-		ft_errputstr(strerror(errno));
-		return (1);
+		waitpid(child, NULL, WNOHANG);
+		dup2(tube[0], STDIN_FILENO);
+		close(tube[1]);
+		dup2(fd2, STDOUT_FILENO);
+		if (execve(cmd2_fct, cmd2_args, env) == -1)
+		{
+			ft_errputstr(strerror(errno));
+			return (1);
+		}
+		close(fd2);
 	}
-	close(fd2);
-	}
-
 	free(cmd1_fct);
 	free(cmd1_args);
 	free(cmd2_fct);

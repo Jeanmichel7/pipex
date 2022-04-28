@@ -6,7 +6,7 @@
 /*   By: jrasser <jrasser@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/28 17:56:23 by jeulliot          #+#    #+#             */
-/*   Updated: 2022/04/28 14:01:42 by jrasser          ###   ########.fr       */
+/*   Updated: 2022/04/28 14:07:47 by jrasser          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,6 @@
 void	ft_check_arg_error(int argc, char **argv)
 {
 	(void)argv;
-
 	if (argc != 5)
 	{
 		write (2, "Error\n", 6);

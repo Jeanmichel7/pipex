@@ -6,7 +6,7 @@
 #    By: jrasser <jrasser@42.fr>                    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/04/08 20:19:03 by jrasser           #+#    #+#              #
-#    Updated: 2022/04/28 12:15:56 by jrasser          ###   ########.fr        #
+#    Updated: 2022/04/28 14:08:53 by jrasser          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -18,11 +18,11 @@ OBJS			= ${SRCS:.c=.o}
 NAME			= pipex
 CC				= gcc
 RM				= rm -f
-CFLAGS			= -Wall -Wextra
+CFLAGS			= -Wall -Wextra -Werror
 CPPFLAGS		= -I./includes/
 
 ${NAME}:		${OBJS}
-				gcc -o ${NAME} ${OBJS} main.c -g -L includes/
+				gcc -o ${NAME} ${OBJS} main.c -L includes/
 
 all:			${NAME}
 	
