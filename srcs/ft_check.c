@@ -6,19 +6,19 @@
 /*   By: jrasser <jrasser@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/28 17:56:23 by jeulliot          #+#    #+#             */
-/*   Updated: 2022/04/29 14:20:20 by jrasser          ###   ########.fr       */
+/*   Updated: 2022/04/29 18:26:25 by jrasser          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/pipex.h"
 
-void	ft_errputstr(char *str, int stop)
+void	ft_errputstr(char *str, int stop, int code)
 {
 	if (str)
 	{
 		write(2, str, ft_strlen(str));
 		if (stop)
-			exit(1);
+			exit(code);
 	}
 }
 
@@ -40,6 +40,8 @@ char	*ft_checkacces(char **env, char *cmd)
 	char	*paths;
 	char	**path_tab;
 
+	if (access(cmd, F_OK | X_OK) == 0)
+		return (cmd);
 	i = -1;
 	state = 1;
 	while (env[++i])
@@ -62,16 +64,15 @@ void	ft_check_cmds(char *fct1, char *args1, char *fct2, char *args2)
 {
 	if (fct1 == NULL)
 	{
-		ft_errputstr("zsh: command not found: ", 0);
-		ft_errputstr(args1, 0);
-		ft_errputstr("\n", 0);
+		ft_errputstr("zsh: command not found: ", 0, 0);
+		ft_errputstr(args1, 0, 0);
+		ft_errputstr("\n", 0, 0);
 	}
 	if (fct2 == NULL)
 	{
-		ft_errputstr("zsh: command not found: ", 0);
-		ft_errputstr(args2, 0);
-		ft_errputstr("\n", 0);
-		exit (0);
+		ft_errputstr("zsh: command not found: ", 0, 0);
+		ft_errputstr(args2, 0, 0);
+		ft_errputstr("\n", 1, 127);
 	}
 }
 
@@ -79,15 +80,12 @@ void	ft_check_fds(int fd1, int fd2, char *fct)
 {
 	if (fd1 == -1)
 	{
-		ft_errputstr("zsh: no such file or directory: ", 0);
-		ft_errputstr(fct, 0);
-		ft_errputstr("\n", 0);
-		exit (0);
+		ft_errputstr("zsh: no such file or directory: ", 0, 0);
+		ft_errputstr(fct, 0, 0);
+		ft_errputstr("\n", 0, 0);
 	}
 	if (fd2 == -1)
 	{
-		perror("opening or creation impossible\n");
-		ft_errputstr(strerror(errno), 0);
-		exit (0);
+		ft_errputstr(strerror(errno), 1, 1);
 	}
 }

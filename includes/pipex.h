@@ -6,7 +6,7 @@
 /*   By: jrasser <jrasser@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/08 20:21:46 by jrasser           #+#    #+#             */
-/*   Updated: 2022/04/29 14:13:18 by jrasser          ###   ########.fr       */
+/*   Updated: 2022/04/29 17:57:28 by jrasser          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,6 +46,6 @@ char	*ft_strtrim(char const *s1, char const *set);
 char	*ft_checkacces(char **env, char *cmd);
 void	ft_check_cmds(char *fct1, char *args1, char *fct2, char *args2);
 void	ft_check_fds(int fd1, int fd2, char *fct);
-void	ft_errputstr(char *str, int stop);
+void	ft_errputstr(char *str, int stop, int code);
 void	ft_check_fds(int fd1, int fd2, char *fct);
 #endif

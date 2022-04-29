@@ -6,7 +6,7 @@
 /*   By: jrasser <jrasser@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/08 20:09:07 by jrasser           #+#    #+#             */
-/*   Updated: 2022/04/29 14:20:21 by jrasser          ###   ########.fr       */
+/*   Updated: 2022/04/29 18:23:24 by jrasser          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,7 +42,7 @@ void	ft_exec_cmd1(t_var *var, char **env)
 	if (execve(var->cmd1_fct, var->cmd1_args, env) == -1)
 	{
 		if (var->cmd1_fct != NULL)
-			ft_errputstr(strerror(errno), 0);
+			ft_errputstr(strerror(errno), 0, 0);
 		exit (1);
 	}
 	close(var->fd1);
@@ -54,9 +54,9 @@ int	main(int argc, char **argv, char **env)
 
 	ft_check_arg_error(argc, argv);
 	var = ft_init_var(argv, env);
+	ft_check_fds(var->fd1, var->fd2, argv[2]);
 	ft_check_cmds(var->cmd1_fct, var->cmd1_args[0], \
 	var->cmd2_fct, var->cmd2_args[0]);
-	ft_check_fds(var->fd1, var->fd2, argv[2]);
 	pipe(var->tube);
 	var->child = fork();
 	if (var->child == -1)
@@ -70,7 +70,7 @@ int	main(int argc, char **argv, char **env)
 		close(var->tube[1]);
 		dup2(var->fd2, STDOUT_FILENO);
 		if (execve(var->cmd2_fct, var->cmd2_args, env) == -1)
-			ft_errputstr(strerror(errno), 1);
+			ft_errputstr(strerror(errno), 1, 1);
 		close(var->fd2);
 	}
 	ft_free(var->cmd1_fct, var->cmd1_args, var->cmd2_fct, var->cmd1_args);
