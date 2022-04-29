@@ -1,3 +1,0 @@
- "un message",
- "un autre message",
- "une ville"

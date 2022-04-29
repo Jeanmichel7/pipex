@@ -6,127 +6,73 @@
 /*   By: jrasser <jrasser@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/08 20:09:07 by jrasser           #+#    #+#             */
-/*   Updated: 2022/04/28 14:17:28 by jrasser          ###   ########.fr       */
+/*   Updated: 2022/04/29 14:20:21 by jrasser          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "includes/pipex.h"
 
-void	ft_errputstr(char *str)
+void	ft_free(char *cmd1_fct, char **cmd1_args, char *cmd2_fct, char **cmd2s)
 {
-	if (str)
-	{
-		write(2, str, ft_strlen(str));
-	}
+	free(cmd1_fct);
+	free(cmd1_args);
+	free(cmd2_fct);
+	free(cmd2s);
 }
 
-char	*ft_checkacces(char **env, char *cmd)
+t_var	*ft_init_var(char **argv, char **env)
 {
-	int		i;
-	int		state;
-	char	*path_cmd_test;
-	char	*paths;
-	char	**path_tab;
+	t_var	*var;
 
-	i = -1;
-	state = 1;
-	while (env[++i])
-		if (strncmp(env[i], "PATH", 4) == 0)
-			paths = env[i];
-	paths = paths + 5;
-	path_tab = ft_split(paths, ':');
-	i = 0;
-	while (path_tab[i] && state)
+	var = malloc(sizeof(t_var));
+	var->cmd1_args = ft_split(argv[2], ' ');
+	var->cmd1_fct = ft_checkacces(env, var->cmd1_args[0]);
+	var->cmd2_args = ft_split(argv[3], ' ');
+	var->cmd2_fct = ft_checkacces(env, var->cmd2_args[0]);
+	var->fd1 = open(argv[1], O_RDONLY);
+	var->fd2 = open(argv[4], O_WRONLY | O_CREAT | O_TRUNC, S_IRWXU);
+	return (var);
+}
+
+void	ft_exec_cmd1(t_var *var, char **env)
+{
+	dup2(var->fd1, STDIN_FILENO);
+	dup2(var->tube[1], STDOUT_FILENO);
+	close(var->tube[0]);
+	if (execve(var->cmd1_fct, var->cmd1_args, env) == -1)
 	{
-		path_cmd_test = ft_strjoin(ft_strjoin(path_tab[i], "/"), cmd);
-		if (access(path_cmd_test, F_OK | X_OK) == 0)
-			return (path_cmd_test);
-		i++;
+		if (var->cmd1_fct != NULL)
+			ft_errputstr(strerror(errno), 0);
+		exit (1);
 	}
-	return (NULL);
+	close(var->fd1);
 }
 
 int	main(int argc, char **argv, char **env)
 {
-	pid_t	child;
-	int		tube[2];
-	int		fd1;
-	int		fd2;
-	char	*cmd1_fct;
-	char	**cmd1_args;
-	char	*cmd2_fct;
-	char	**cmd2_args;
+	t_var	*var;
 
 	ft_check_arg_error(argc, argv);
-	cmd1_args = ft_split(argv[2], ' ');
-	cmd1_fct = ft_checkacces(env, cmd1_args[0]);
-	cmd2_args = ft_split(argv[3], ' ');
-	cmd2_fct = ft_checkacces(env, cmd2_args[0]);
-	fd1 = open(argv[1], O_RDONLY);
-	fd2 = open(argv[4], O_WRONLY | O_CREAT | O_TRUNC, S_IRWXU);
-	if (cmd1_fct == NULL)
-	{
-		ft_errputstr("zsh: command not found: ");
-		ft_errputstr(cmd1_args[0]);
-		ft_errputstr("\n");
-	}
-	if (cmd2_fct == NULL)
-	{
-		ft_errputstr("zsh: command not found: ");
-		ft_errputstr(cmd2_args[0]);
-		ft_errputstr("\n");
-		return (0);
-	}
-	if (fd1 == - 1)
-	{
-		ft_errputstr("zsh: no such file or directory: ");
-		ft_errputstr(argv[1]);
-		ft_errputstr("\n");
-		return (0);
-	}
-	if (fd2 == - 1)
-	{
-		perror("opening or creation impossible\n");
-		ft_errputstr(strerror(errno));
-		return (0);
-	}
-	pipe(tube);
-	child = fork();
-	if (child == -1)
-	{
+	var = ft_init_var(argv, env);
+	ft_check_cmds(var->cmd1_fct, var->cmd1_args[0], \
+	var->cmd2_fct, var->cmd2_args[0]);
+	ft_check_fds(var->fd1, var->fd2, argv[2]);
+	pipe(var->tube);
+	var->child = fork();
+	if (var->child == -1)
 		perror("Error");
-		return (1);
-	}
-	if (child == 0)
-	{
-		dup2(fd1, STDIN_FILENO);
-		dup2(tube[1], STDOUT_FILENO);
-		close(tube[0]);
-		if (execve(cmd1_fct, cmd1_args, env) == -1 )
-		{
-			if (cmd1_fct != NULL)
-				ft_errputstr(strerror(errno));
-			return (1);
-		}
-		close(fd1);
-	}
+	if (var->child == 0)
+		ft_exec_cmd1(var, env);
 	else
 	{
-		waitpid(child, NULL, WNOHANG);
-		dup2(tube[0], STDIN_FILENO);
-		close(tube[1]);
-		dup2(fd2, STDOUT_FILENO);
-		if (execve(cmd2_fct, cmd2_args, env) == -1)
-		{
-			ft_errputstr(strerror(errno));
-			return (1);
-		}
-		close(fd2);
+		waitpid(var->child, NULL, WNOHANG);
+		dup2(var->tube[0], STDIN_FILENO);
+		close(var->tube[1]);
+		dup2(var->fd2, STDOUT_FILENO);
+		if (execve(var->cmd2_fct, var->cmd2_args, env) == -1)
+			ft_errputstr(strerror(errno), 1);
+		close(var->fd2);
 	}
-	free(cmd1_fct);
-	free(cmd1_args);
-	free(cmd2_fct);
-	free(cmd1_args);
-
+	ft_free(var->cmd1_fct, var->cmd1_args, var->cmd2_fct, var->cmd1_args);
 	return (0);
 }
