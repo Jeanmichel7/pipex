@@ -6,19 +6,22 @@
 /*   By: jrasser <jrasser@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/28 17:56:23 by jeulliot          #+#    #+#             */
-/*   Updated: 2022/04/29 18:26:25 by jrasser          ###   ########.fr       */
+/*   Updated: 2022/05/02 16:40:59 by jrasser          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/pipex.h"
 
-void	ft_errputstr(char *str, int stop, int code)
+void	ft_errputstr(char *str, int stop, int code, t_var *var)
 {
 	if (str)
 	{
 		write(2, str, ft_strlen(str));
 		if (stop)
+		{
+			ft_free(var);
 			exit(code);
+		}
 	}
 }
 
@@ -64,15 +67,15 @@ void	ft_check_cmds(char *fct1, char *args1, char *fct2, char *args2)
 {
 	if (fct1 == NULL)
 	{
-		ft_errputstr("zsh: command not found: ", 0, 0);
-		ft_errputstr(args1, 0, 0);
-		ft_errputstr("\n", 0, 0);
+		ft_errputstr("zsh: command not found: ", 0, 0, NULL);
+		ft_errputstr(args1, 0, 0, NULL);
+		ft_errputstr("\n", 0, 0, NULL);
 	}
 	if (fct2 == NULL)
 	{
-		ft_errputstr("zsh: command not found: ", 0, 0);
-		ft_errputstr(args2, 0, 0);
-		ft_errputstr("\n", 1, 127);
+		ft_errputstr("zsh: command not found: ", 0, 0, NULL);
+		ft_errputstr(args2, 0, 0, NULL);
+		ft_errputstr("\n", 1, 127, NULL);
 	}
 }
 
@@ -80,12 +83,12 @@ void	ft_check_fds(int fd1, int fd2, char *fct)
 {
 	if (fd1 == -1)
 	{
-		ft_errputstr("zsh: no such file or directory: ", 0, 0);
-		ft_errputstr(fct, 0, 0);
-		ft_errputstr("\n", 0, 0);
+		ft_errputstr("zsh: ", 0, 0, NULL);
+		ft_errputstr(strerror(errno), 0, 0, NULL);
+		ft_errputstr(": ", 0, 0, NULL);
+		ft_errputstr(fct, 0, 0, NULL);
+		ft_errputstr("\n", 0, 0, NULL);
 	}
 	if (fd2 == -1)
-	{
-		ft_errputstr(strerror(errno), 1, 1);
-	}
+		ft_errputstr(strerror(errno), 1, 1, NULL);
 }
