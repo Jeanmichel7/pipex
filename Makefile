@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: jrasser <jrasser@42.fr>                    +#+  +:+       +#+         #
+#    By: jrasser <jrasser@student.42mulhouse.fr>    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/04/08 20:19:03 by jrasser           #+#    #+#              #
-#    Updated: 2022/04/29 19:56:40 by jrasser          ###   ########.fr        #
+#    Updated: 2023/09/01 21:16:17 by jrasser          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -30,7 +30,7 @@ clean:
 				${RM} ${OBJS}
 
 fclean:			clean
-				${RM} ${NAME}
+				${RM} ${NAME} outfile
 	
 re:				fclean all
 

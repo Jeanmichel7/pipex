@@ -1,0 +1,7 @@
+blabla
+
+obj :{
+  param1: :abc",
+  param2: "def",
+  param3: "ghi"
+}
